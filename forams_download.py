@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+import errno
 import requests, zipfile, io 
 
 logging.basicConfig(level=logging.INFO)
