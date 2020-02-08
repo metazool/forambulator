@@ -1,6 +1,9 @@
 import json
 import os
+import logging
 import requests, zipfile, io 
+
+logging.basicConfig(level=logging.INFO)
 
 START = 'http://endlessforams.org/summary'
 DATA = 'http://endlessforams.org/randomizer/download/{0}/{1}?download=capsule.zip'
@@ -17,9 +20,11 @@ def download_data(name, number):
     dir_name = os.path.join(os.getcwd(), 'data', name.replace(' ','_'))
     os.makedirs(dir_name)
     r = requests.get(url, stream=True)
-
-    z = zipfile.ZipFile(io.BytesIO(r.content))
-    z.extractall(dir_name)
-
+    try:
+        z = zipfile.ZipFile(io.BytesIO(r.content))
+        z.extractall(dir_name)
+    except: 
+        logging.error(f"not really a zipfile at {url}")
+        
 if __name__ == '__main__':
     download_capsules()
