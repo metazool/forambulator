@@ -18,7 +18,12 @@ def download_data(name, number):
     url = DATA.format(name, number)
     # "results": [{"sci_name": "Beella digitata", "amount_images": 40},
     dir_name = os.path.join(os.getcwd(), 'data', name.replace(' ','_'))
-    os.makedirs(dir_name)
+    try:
+        os.makedirs(dir_name)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+            
     r = requests.get(url, stream=True)
     try:
         z = zipfile.ZipFile(io.BytesIO(r.content))
