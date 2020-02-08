@@ -1,6 +1,8 @@
 """Utilities for image processing - based on stylegan-art forked here
 https://github.com/metazool/stylegan-art/blob/master/dataset_tool.py
 """
+import os
+import logging
 import numpy as np
 import tensorflow as tf
 import PIL.Image
@@ -8,16 +10,19 @@ import PIL.Image
 
 
 class TFRecordExporter:
-    def __init__(self, tfrecord_dir, expected_images, print_progress=True, progress_interval=10):
-        self.tfrecord_dir       = tfrecord_dir
-        self.tfr_prefix         = os.path.join(self.tfrecord_dir, os.path.basename(self.tfrecord_dir))
-        self.expected_images    = expected_images
-        self.cur_images         = 0
-        self.shape              = None
-        self.resolution_log2    = None
-        self.tfr_writers        = []
-        self.print_progress     = print_progress
-        self.progress_interval  = progress_interval
+    def __init__(self, tfrecord_dir, expected_images,
+                 print_progress=True, progress_interval=10):
+        self.tfrecord_dir = tfrecord_dir
+        self.tfr_prefix = os.path.join(
+            self.tfrecord_dir, os.path.basename(
+                self.tfrecord_dir))
+        self.expected_images = expected_images
+        self.cur_images = 0
+        self.shape = None
+        self.resolution_log2 = None
+        self.tfr_writers = []
+        self.print_progress = print_progress
+        self.progress_interval = progress_interval
 
         if self.print_progress:
             print('Creating dataset "%s"' % tfrecord_dir)
@@ -35,29 +40,40 @@ class TFRecordExporter:
             print('%-40s\r' % '', end='', flush=True)
             print('Added %d images.' % self.cur_images)
 
-    def choose_shuffled_order(self): # Note: Images and labels must be added in shuffled order.
+    # Note: Images and labels must be added in shuffled order.
+    def choose_shuffled_order(self):
         order = np.arange(self.expected_images)
         np.random.RandomState(123).shuffle(order)
         return order
 
     def add_image(self, img):
         if self.print_progress and self.cur_images % self.progress_interval == 0:
-            print('%d / %d\r' % (self.cur_images, self.expected_images), end='', flush=True)
+            print(
+                '%d / %d\r' %
+                (self.cur_images,
+                 self.expected_images),
+                end='',
+                flush=True)
         if self.shape is None:
             self.shape = img.shape
             self.resolution_log2 = int(np.log2(self.shape[1]))
             assert self.shape[0] in [1, 3]
             assert self.shape[1] == self.shape[2]
             assert self.shape[1] == 2**self.resolution_log2
-            tfr_opt = tf.python_io.TFRecordOptions(tf.python_io.TFRecordCompressionType.NONE)
+            tfr_opt = tf.python_io.TFRecordOptions(
+                tf.python_io.TFRecordCompressionType.NONE)
             for lod in range(self.resolution_log2 - 1):
-                tfr_file = self.tfr_prefix + '-r%02d.tfrecords' % (self.resolution_log2 - lod)
-                self.tfr_writers.append(tf.python_io.TFRecordWriter(tfr_file, tfr_opt))
+                tfr_file = self.tfr_prefix + \
+                    '-r%02d.tfrecords' % (self.resolution_log2 - lod)
+                self.tfr_writers.append(
+                    tf.python_io.TFRecordWriter(
+                        tfr_file, tfr_opt))
         assert img.shape == self.shape
         for lod, tfr_writer in enumerate(self.tfr_writers):
             if lod:
                 img = img.astype(np.float32)
-                img = (img[:, 0::2, 0::2] + img[:, 0::2, 1::2] + img[:, 1::2, 0::2] + img[:, 1::2, 1::2]) * 0.25
+                img = (img[:, 0::2, 0::2] + img[:, 0::2, 1::2] +
+                       img[:, 1::2, 0::2] + img[:, 1::2, 1::2]) * 0.25
             quant = np.rint(img).clip(0, 255).astype(np.uint8)
             ex = tf.train.Example(features=tf.train.Features(feature={
                 'shape': tf.train.Feature(int64_list=tf.train.Int64List(value=quant.shape)),
@@ -82,9 +98,10 @@ class TFRecordExporter:
 def list_image_filenames(image_dir):
     """Recurse through image_dir, return paths to jpg files"""
     matches = []
-    for root, dirnames, filenames in os.walk(source):
-        for filename in fnmatch.filter(filenames, '*.jpg'):
-            matches.append(os.path.join(root, filename))
+    for root, dirnames, filenames in os.walk(image_dir):
+        for filename in filenames:
+            if filename.endswith('jpg'):
+                matches.append(os.path.join(root, filename))
     return matches
 
 
@@ -92,24 +109,24 @@ def tfrecords_from_images(tfrecord_dir, image_dir, shuffle):
     print('Loading images from "%s"' % image_dir)
     image_filenames = list_image_filenames(image_dir)
     if len(image_filenames) == 0:
-        error('No input images found')
+        logging.error('No input images found')
 
     img = np.asarray(PIL.Image.open(image_filenames[0]))
     resolution = img.shape[0]
     channels = img.shape[2] if img.ndim == 3 else 1
     if img.shape[1] != resolution:
-        error('Input images must have the same width and height')
+        logging.error('Input images must have the same width and height')
     if resolution != 2 ** int(np.floor(np.log2(resolution))):
-        error('Input image resolution must be a power-of-two')
+        logging.error('Input image resolution must be a power-of-two')
     if channels not in [1, 3]:
-        error('Input images must be stored as RGB or grayscale')
+        logging.error('Input images must be stored as RGB or grayscale')
 
     with TFRecordExporter(tfrecord_dir, len(image_filenames)) as tfr:
         order = tfr.choose_shuffled_order() if shuffle else np.arange(len(image_filenames))
         for idx in range(order.size):
             img = np.asarray(PIL.Image.open(image_filenames[order[idx]]))
             if channels == 1:
-                img = img[np.newaxis, :, :] # HW => CHW
+                img = img[np.newaxis, :, :]  # HW => CHW
             else:
-                img = img.transpose([2, 0, 1]) # HWC => CHW
+                img = img.transpose([2, 0, 1])  # HWC => CHW
             tfr.add_image(img)
