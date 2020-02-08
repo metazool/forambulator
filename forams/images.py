@@ -106,7 +106,7 @@ def list_image_filenames(image_dir):
     matches = []
     for root, dirnames, filenames in os.walk(image_dir):
         for filename in filenames:
-            if filename.endswith('jpg'):
+            if filename.endswith('jpg') or filename.endswith('png'):
                 matches.append(os.path.join(root, filename))
     return matches
 
