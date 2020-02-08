@@ -2,7 +2,7 @@ import json
 import os
 import logging
 import errno
-import requests, zipfile, io 
+import requests, zipfile, io
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,13 +26,13 @@ def download_data(name, number, overwrite=False):
             raise
         elif not overwrite:
             return
-            
+
     r = requests.get(url, stream=True)
     try:
         z = zipfile.ZipFile(io.BytesIO(r.content))
         z.extractall(dir_name)
-    except: 
+    except:
         logging.error(f"not really a zipfile at {url}")
-        
+
 if __name__ == '__main__':
     download_capsules()
