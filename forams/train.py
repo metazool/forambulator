@@ -1,6 +1,8 @@
 """Kick off the StyleGAN training loop
 Code lifted from the demo notebook forked at
 https://github.com/metazool/stylegan-art/blob/master/styleganportraits.ipynb
+
+This needs to run with a checkout of stylegan-art in its PYTHONPATH
 """
 import copy
 import dnnlib
