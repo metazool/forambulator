@@ -1,11 +1,17 @@
 """Utilities for image processing - based on stylegan-art forked here
 https://github.com/metazool/stylegan-art/blob/master/dataset_tool.py
+And on the region thresholding examples in skimage
 """
 import os
 import logging
 import numpy as np
 import tensorflow as tf
 import PIL.Image
+from skimage.measure import label, regionprops
+from skimage.transform import resize
+import skimage.io
+import skimage.filters
+
 #import dnnlib.tflib as tflib
 
 
@@ -130,3 +136,34 @@ def tfrecords_from_images(tfrecord_dir, image_dir, shuffle):
             else:
                 img = img.transpose([2, 0, 1])  # HWC => CHW
             tfr.add_image(img)
+
+
+def crop_foram(filename):
+    """Accepts a filename of an image collected from Endless Forams
+    Finds the region with the actual foram in it, resizes to 128x128,
+    Saves the results in './cropped_forams'"""
+
+    image = skimage.io.imread(fname=filename)
+    image = skimage.color.rgb2gray(image)
+    t = skimage.filters.threshold_otsu(image)
+    mask = image > t
+
+    label_img = label(mask, connectivity=mask.ndim)
+    props = regionprops(label_img)
+
+    # the foram will be in the region with second biggest area
+    props = sorted(props, key=lambda prop: prop.area)
+    size = 128
+    pad = 5
+    region = props[-2]
+    minr, minc, maxr, maxc = region.bbox
+
+    cropped = resize(image[minr-pad:maxr+pad, minc-pad:maxc+pad], (size, size) )
+
+    out_dir = "cropped_forams/"
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    # save each cropped image by its original filename
+    filename = filename.replace('.jpg', '.png')
+    skimage.io.imsave(os.path.join(out_dir, filename), cropped)
