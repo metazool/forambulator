@@ -165,5 +165,6 @@ def crop_foram(filename):
         os.makedirs(out_dir)
 
     # save each cropped image by its original filename
+    filename = filename.split('/')[-1]
     filename = filename.replace('.jpg', '.png')
     skimage.io.imsave(os.path.join(out_dir, filename), cropped)
