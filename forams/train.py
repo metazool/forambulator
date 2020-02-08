@@ -9,7 +9,7 @@ from dnnlib import EasyDict
 import config
 
 
-def train():
+def train(tfrecord_dir=None):
 
     # Description string included in result subdir name.
     desc = 'sgan'
@@ -48,7 +48,7 @@ def train():
     sched.G_lrate_dict = {128: 0.0015, 256: 0.002, 512: 0.003, 1024: 0.003}
     sched.D_lrate_dict = EasyDict(sched.G_lrate_dict)
     desc += '-custom'
-    dataset = EasyDict(tfrecord_dir='./tfrecords')
+    dataset = EasyDict(tfrecord_dir=tfrecord_dir)
     train.mirror_augment = True
     # Number of GPUs.
     desc += '-1gpu'
