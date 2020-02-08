@@ -6,8 +6,6 @@ import tensorflow as tf
 import PIL.Image
 #import dnnlib.tflib as tflib
 
-from training import dataset
-
 
 class TFRecordExporter:
     def __init__(self, tfrecord_dir, expected_images, print_progress=True, progress_interval=10):
