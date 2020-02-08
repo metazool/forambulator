@@ -11,7 +11,7 @@ from skimage.measure import label, regionprops
 from skimage.transform import resize
 import skimage.io
 import skimage.filters
-
+from skimage import img_as_ubyte
 #import dnnlib.tflib as tflib
 
 
@@ -167,4 +167,4 @@ def crop_foram(filename):
     # save each cropped image by its original filename
     filename = filename.split('/')[-1]
     filename = filename.replace('.jpg', '.png')
-    skimage.io.imsave(os.path.join(out_dir, filename), cropped)
+    skimage.io.imsave(os.path.join(out_dir, filename), img_as_ubyte(cropped))
