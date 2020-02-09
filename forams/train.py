@@ -11,7 +11,7 @@ from dnnlib import EasyDict
 import config
 
 
-def train(tfrecord_dir=None, resume_from=None):
+def train(tfrecord_dir=None, resume_from=None, save_ticks=1):
 
     # Description string included in result subdir name.
     desc = 'sgan'
@@ -74,7 +74,8 @@ def train(tfrecord_dir=None, resume_from=None):
         D_opt_args=D_opt,
         G_loss_args=G_loss,
         D_loss_args=D_loss,
-        resume_run_id=resume_from)
+        resume_run_id=resume_from,
+        network_snapshot_ticks=save_ticks)
     kwargs.update(
         dataset_args=dataset,
         sched_args=sched,
