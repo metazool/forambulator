@@ -170,26 +170,23 @@ def crop_foram(filename, directory=None, size=256, pad=4):
 
     image = skimage.io.imread(fname=filename)
     image = skimage.color.rgb2gray(image)
-    t = skimage.filters.threshold_yen(image)
-    mask = image > t
 
-    label_img = label(mask, connectivity=mask.ndim)
-    props = regionprops(label_img)
-
-    # sometimes we just can't find a foram
-    region = best_guess_crop(props)
+    region = regions_threshold(image)
+    # In some cases Yen threshold fails, we see the whole image; use Otsu
+    # There must be several better ways
+    if not region or region.area > 100000:
+        region = regions_threshold(image, method=skimage.filters.threshold_otsu)
     if not region:
-        raise NoForamFound("couldn't select a foram")
+        raise NoForamFound("couldn't identify the foram")
 
     minr, minc, maxr, maxc = region.bbox
-
     cropped = None
     try:
-        cropped = resize(image[minr-pad:maxr+pad, minc-pad:maxc+pad],
+      cropped = resize(image[minr-pad:maxr+pad, minc-pad:maxc+pad],
                        (size, size),
                        preserve_range=True)
     except ValueError:
-        raise NoForamFound("couldnt resize the crop")
+      raise NoForamFound("couldnt resize the crop")
 
     if directory:
         if not os.path.exists(directory):
@@ -200,3 +197,14 @@ def crop_foram(filename, directory=None, size=256, pad=4):
         filename = filename.replace('.jpg', '.png')
         skimage.io.imsave(os.path.join(directory, filename), cropped)
     return cropped
+
+
+def regions_threshold(image, method=skimage.filters.threshold_yen):
+    t = method(image)
+    mask = image > t
+
+    label_img = label(mask, connectivity=mask.ndim)
+    props = regionprops(label_img)
+
+    region = best_guess_crop(props)
+    return region
