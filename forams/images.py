@@ -12,7 +12,6 @@ from skimage.transform import resize
 import skimage.io
 import skimage.filters
 from skimage import img_as_ubyte
-#import dnnlib.tflib as tflib
 
 
 class TFRecordExporter:
@@ -138,10 +137,12 @@ def tfrecords_from_images(tfrecord_dir, image_dir, shuffle):
             tfr.add_image(img)
 
 
-def crop_foram(filename):
+def crop_foram(filename, directory=None, size=256, pad=4):
     """Accepts a filename of an image collected from Endless Forams
-    Finds the region with the actual foram in it, resizes to 128x128,
-    Saves the results in './cropped_forams'"""
+    Finds the region with the actual foram in it, resizes,
+    Saves the results in directory if specified,
+    Returns the result of the crop
+    Accepts image size (default 256) and padding around selection"""
 
     image = skimage.io.imread(fname=filename)
     image = skimage.color.rgb2gray(image)
@@ -151,20 +152,19 @@ def crop_foram(filename):
     label_img = label(mask, connectivity=mask.ndim)
     props = regionprops(label_img)
 
-    # the foram will be in the region with second biggest area
+    # the foram will _often_ be in the region with second biggest area
     props = sorted(props, key=lambda prop: prop.area)
-    size = 128
-    pad = 5
     region = props[-2]
     minr, minc, maxr, maxc = region.bbox
 
-    cropped = resize(image[minr-pad:maxr+pad, minc-pad:maxc+pad], (size, size) )
+    cropped = resize(img_as_ubyte(image)[minr-pad:maxr+pad, minc-pad:maxc+pad], (size, size))
 
-    out_dir = "cropped_forams/"
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+    if directory:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
-    # save each cropped image by its original filename
-    filename = filename.split('/')[-1]
-    filename = filename.replace('.jpg', '.png')
-    skimage.io.imsave(os.path.join(out_dir, filename), img_as_ubyte(cropped))
+        # save each cropped image by its original filename
+        filename = filename.split('/')[-1]
+        filename = filename.replace('.jpg', '.png')
+        skimage.io.imsave(os.path.join(directory, filename), cropped)
+    return cropped
