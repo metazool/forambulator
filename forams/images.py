@@ -149,7 +149,16 @@ def best_guess_crop(props):
         ratio = prop.minor_axis_length / prop.major_axis_length
         ratios.append(ratio)
     use_index = ratios.index(max(ratios))
-    return props[use_index]
+    best_guess = props[use_index]
+    # In some cases we can't threshold the foram and select the
+    # largest character instead; in which case return nothing
+    if best_guess.area > 100:
+        best_guess = None
+    return best_guess
+
+
+class NoForamFound(Exception):
+    pass
 
 
 def crop_foram(filename, directory=None, size=256, pad=4):
@@ -167,8 +176,11 @@ def crop_foram(filename, directory=None, size=256, pad=4):
     label_img = label(mask, connectivity=mask.ndim)
     props = regionprops(label_img)
 
-    # the foram will _often_ be in the region with second biggest area
+    # sometimes we just can't find a foram
     region = best_guess_crop(props)
+    if not region:
+        raise NoForamFound
+
     minr, minc, maxr, maxc = region.bbox
 
     cropped = resize(img_as_ubyte(image)[minr-pad:maxr+pad, minc-pad:maxc+pad], (size, size))
