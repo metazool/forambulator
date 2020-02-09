@@ -137,6 +137,21 @@ def tfrecords_from_images(tfrecord_dir, image_dir, shuffle):
             tfr.add_image(img)
 
 
+def best_guess_crop(props):
+    """The foram will often be in the region with second biggest area
+    It ought to be in the squarest area in the largest couple of regions
+    Yes I am sure this probably would be more efficient with retinanet etc
+    """
+    props = sorted(props, key=lambda prop: prop.area)
+    props.reverse()
+    ratios = []
+    for index, prop in enumerate(props[0:2]):
+        ratio = prop.minor_axis_length / prop.major_axis_length
+        ratios.append(ratio)
+    use_index = ratios.index(max(ratios))
+    return props[use_index]
+
+
 def crop_foram(filename, directory=None, size=256, pad=4):
     """Accepts a filename of an image collected from Endless Forams
     Finds the region with the actual foram in it, resizes,
@@ -146,15 +161,14 @@ def crop_foram(filename, directory=None, size=256, pad=4):
 
     image = skimage.io.imread(fname=filename)
     image = skimage.color.rgb2gray(image)
-    t = skimage.filters.threshold_otsu(image)
+    t = skimage.filters.threshold_yen(image)
     mask = image > t
 
     label_img = label(mask, connectivity=mask.ndim)
     props = regionprops(label_img)
 
     # the foram will _often_ be in the region with second biggest area
-    props = sorted(props, key=lambda prop: prop.area)
-    region = props[-2]
+    region = best_guess_crop(props)
     minr, minc, maxr, maxc = region.bbox
 
     cropped = resize(img_as_ubyte(image)[minr-pad:maxr+pad, minc-pad:maxc+pad], (size, size))
