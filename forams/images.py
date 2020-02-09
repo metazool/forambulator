@@ -179,11 +179,17 @@ def crop_foram(filename, directory=None, size=256, pad=4):
     # sometimes we just can't find a foram
     region = best_guess_crop(props)
     if not region:
-        raise NoForamFound
+        raise NoForamFound("couldn't select a foram")
 
     minr, minc, maxr, maxc = region.bbox
 
-    cropped = resize(img_as_ubyte(image)[minr-pad:maxr+pad, minc-pad:maxc+pad], (size, size))
+    cropped = None
+    try:
+        cropped = resize(image[minr-pad:maxr+pad, minc-pad:maxc+pad],
+                       (size, size),
+                       preserve_range=True)
+    except ValueError:
+        raise NoForamFound("couldnt resize the crop")
 
     if directory:
         if not os.path.exists(directory):
