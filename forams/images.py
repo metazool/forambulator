@@ -152,7 +152,7 @@ def best_guess_crop(props):
     best_guess = props[use_index]
     # In some cases we can't threshold the foram and select the
     # largest character instead; in which case return nothing
-    if best_guess.area > 100:
+    if best_guess.area < 100:
         best_guess = None
     return best_guess
 
