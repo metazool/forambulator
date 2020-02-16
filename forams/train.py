@@ -8,10 +8,11 @@ import copy
 import dnnlib
 from dnnlib import EasyDict
 
-import config
 
-
-def train(tfrecord_dir=None, resume_from=None, save_ticks=1):
+def train(tfrecord_dir=None,
+          resume_from=None,
+          result_dir='results',
+          save_ticks=1):
 
     # Description string included in result subdir name.
     desc = 'sgan'
@@ -83,7 +84,6 @@ def train(tfrecord_dir=None, resume_from=None, save_ticks=1):
         tf_config=tf_config)
     kwargs.submit_config = copy.deepcopy(submit_config)
     kwargs.submit_config.run_dir_root = dnnlib.submission.submit.get_template_from_path(
-        config.result_dir)
-    #kwargs.submit_config.run_dir_ignore += config.run_dir_ignore
+        result_dir)
     kwargs.submit_config.run_desc = desc
     dnnlib.submit_run(**kwargs)
