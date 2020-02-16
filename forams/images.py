@@ -1,6 +1,6 @@
 """Utilities for image processing - based on stylegan-art forked here
 https://github.com/metazool/stylegan-art/blob/master/dataset_tool.py
-And on the region thresholding examples in skimage
+And building on the region thresholding examples in skimage
 """
 import os
 import logging
