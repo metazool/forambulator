@@ -18,8 +18,9 @@ http://endlessforams.org/summary
 
 ## Code
 
-Most of this is re-use of the libraries and training routines in the [stylegan-art](https://github.com/ak9250/stylegan-art) project.
-Running the code requires a checkout of `stylegan-art` in one's `PYTHONPATH`.
+Most of this was based on the notebooks and training routines in the [stylegan-art](https://github.com/ak9250/stylegan-art) project.
+It's now shifting to StyleGAN2 re-using the NVLabs[Tensorflow implementation](https://github.com/NVlabs/stylegan2).
+Running the code requires a checkout of `stylegan2` in one's `PYTHONPATH`.
 
 The main addition is a bit of image processing, trying to extract just the foram shape from the original sources, which also include a lot of text metadata. This was a rough and ready approach involving Yen thresholding from scikit-image, falling back to Otsu thresholding if Yen didn't extract a region with the right area, then looking for the most square of the largest regions in the image.
 
