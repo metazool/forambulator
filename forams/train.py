@@ -43,7 +43,7 @@ def train(dataset='tfrecords',
           num_gpus=1,
           gamma=None,
           mirror_augment=True,
-          metrics='fid50k',
+          metrics=['fid50k'],
           total_kimg=25000,
           save_ticks=1):
 
