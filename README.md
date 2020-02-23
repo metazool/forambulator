@@ -1,6 +1,6 @@
 # Infinite Forams most beautiful and most wonderful
 
-![Foram latent space - StyleGAN][gifs/latent_foras.gif]
+![Foram latent space - StyleGAN](gifs/latent_forams.gif)
 
 This was a project training a StyleGAN network to generate a potentially infinite series of parallel universe microfossils, based on the amazing collection of samples at [Endless Forams](http://endlessforams.org/)
 
@@ -28,7 +28,7 @@ The main addition is a bit of image processing, trying to extract just the foram
 
 This was the output from a test run on a Google Colab GPU up to the end of the free 12 hour runtime. Hopefully a longer run would produce much more compellingly detailed images of unreal forams.
 
-![Foram latent space - StyleGAN2 - several runtimes][gifs/yum.gif]|
+![Foram latent space - StyleGAN2 - several runtimes](gifs/yum.gif)
 
 ## Next Steps
 
