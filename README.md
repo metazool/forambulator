@@ -1,7 +1,7 @@
 # Infinite Forams most beautiful and most wonderful
 
 |![Foram latent space - StyleGAN](gifs/latent_forams.gif) | ![Foram latent space - StyleGAN2](gifs/yum.gif)|
-|StyleGAN after one Colab runtume | StyleGAN2 after several runtimes]|
+|StyleGAN after one Colab runtume                         | StyleGAN2 after several runtimes]              |
 
 This was a project training a StyleGAN network to generate a potentially infinite series of parallel universe microfossils, based on the amazing collection of samples at [Endless Forams](http://endlessforams.org/)
 
