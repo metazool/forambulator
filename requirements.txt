@@ -1,6 +1,6 @@
 Pillow
 pytest
-tensorflow
-skimage
 numpy
 requests
+skimage
+stylegan2_pytorch
