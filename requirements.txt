@@ -1,6 +1,5 @@
 Pillow
 pytest
-tensorflow
-skimage
+scikit-image
 numpy
 requests
