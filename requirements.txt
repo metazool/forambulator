@@ -1,5 +1,6 @@
-pytest
+azureml-core
 numpy
+pytest
 requests
 skimage
 stylegan2-pytorch
