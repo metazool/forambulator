@@ -1,4 +1,4 @@
-from forams.images import list_image_filenames
+from forambulator.images import list_image_filenames
 
 
 def test_files():

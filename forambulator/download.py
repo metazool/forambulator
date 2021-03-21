@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import os
 import logging
 import errno
