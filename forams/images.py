@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """Utilities for image processing
 Building on the region thresholding examples in skimage
 """

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import os
 import logging
 import errno
@@ -33,7 +34,8 @@ def download_data(name, number, overwrite=False):
     try:
         z = zipfile.ZipFile(io.BytesIO(r.content))
         z.extractall(dir_name)
-    except BaseException:
+    except BaseException as err:
+        logging.error(err)
         logging.error(f"not really a zipfile at {url}")
 
 
