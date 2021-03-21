@@ -99,9 +99,9 @@ def resize(directory, out_dir, size=(128, 128)):
                                infile.split('/')[-1])
         if infile != outfile:
             try:
-                im = Image.open(infile)
+                im = Image.open(infile).convert('L')
                 im.thumbnail(size, Image.ANTIALIAS)
-                im.save(outfile, "JPEG")
+                im.save(outfile, "PNG")
             except IOError as err:
                 logging.error("cannot resize '%s'" % infile)
                 logging.error(err)
