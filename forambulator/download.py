@@ -11,10 +11,12 @@ START = 'http://endlessforams.org/summary'
 DATA = 'http://endlessforams.org/randomizer/download/{0}/{1}?download=capsule.zip'  # noqa: E501
 
 
-def download_capsules(overwrite=False, directory=None):
+def download_capsules(overwrite=False, directory=None, limit=None):
     summary = requests.get(START).json()
+    if limit:
+        summary['results'] = summary['results'][0:limit]
     for taxon in summary['results']:
-        download_data(taxon['sci_name'], 
+        download_data(taxon['sci_name'],
                       taxon['amount_images'],
                       directory=directory)
 
