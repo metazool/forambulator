@@ -3,4 +3,4 @@ pytest
 numpy
 requests
 skimage
-stylegan2_pytorch
+stylegan2-pytorch
